@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>激活码生成器 - 专升本备考APP</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 { font-size:20px; margin-bottom:16px; color:#1a73e8; }
+    h2 { font-size:16px; margin-bottom:12px; }
+    label { display:block; font-size:13px; font-weight:600; margin-bottom:4px; color:#666; }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 12px;
+      font-family: monospace;
+    }
+    input:focus, select:focus { border-color: #1a73e8; outline: none; }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #1a73e8;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+    button:active { opacity: 0.8; }
+    button.secondary { background: #fff; color: #1a73e8; border: 1px solid #1a73e8; }
+    .result {
+      background: #e8f5e9;
+      border: 2px solid #4caf50;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      margin: 12px 0;
+    }
+    .result .key {
+      font-size: 18px;
+      font-weight: 700;
+      font-family: monospace;
+      letter-spacing: 2px;
+      color: #2e7d32;
+      word-break: break-all;
+    }
+    .history {
+      max-height: 300px;
+      overflow-y: auto;
+      font-size: 12px;
+    }
+    .history-item {
+      padding: 8px;
+      border-bottom: 1px solid #f0f0f0;
+      font-family: monospace;
+    }
+    .history-item span { color: #666; }
+    .danger { color: #d50000; font-size: 12px; margin-top: 4px; }
+    .info { color: #666; font-size: 12px; margin-top: 4px; }
+    .tabs { display:flex; gap:8px; margin-bottom:16px; }
+    .tabs button { flex:1; padding:8px; font-size:13px; border-radius:20px; }
+    .tabs button.active { background:#1a73e8; color:#fff; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🔐 激活码生成器</h1>
+    <p style="font-size:13px;color:#666;margin-bottom:16px">
+      卖家专用工具 · 请妥善保管 · 勿泄露给考生
+    </p>
+
+    <div class="tabs">
+      <button class="active" onclick="switchTab('single')">单一激活码</button>
+      <button onclick="switchTab('batch')">批量生成</button>
+    </div>
+
+    <!-- 单一生成 -->
+    <div id="tab-single">
+      <label>考生机器码</label>
+      <input type="text" id="machineCode" placeholder="输入考生的16位机器码" maxlength="20">
+
+      <label>有效期</label>
+      <select id="expiryType">
+        <option value="30">30天</option>
+        <option value="90">90天</option>
+        <option value="180">180天</option>
+        <option value="365">365天</option>
+        <option value="0" selected>永久有效</option>
+      </select>
+
+      <label>类型</label>
+      <select id="licenseType">
+        <option value="D">设备绑定（仅限该设备使用）</option>
+        <option value="U">通用激活码（不限设备）</option>
+      </select>
+
+      <button onclick="generateSingle()">🔑 生成激活码</button>
+      <div id="single-result"></div>
+    </div>
+
+    <!-- 批量生成 -->
+    <div id="tab-batch" style="display:none">
+      <label>批量机器码（每行一个）</label>
+      <textarea id="batchCodes" rows="5" placeholder="粘贴考生机器码，每行一个..."></textarea>
+
+      <label>有效期</label>
+      <select id="batchExpiry">
+        <option value="30">30天</option>
+        <option value="90">90天</option>
+        <option value="180">180天</option>
+        <option value="365">365天</option>
+        <option value="0" selected>永久有效</option>
+      </select>
+
+      <button onclick="generateBatch()">📦 批量生成</button>
+      <button class="secondary" onclick="exportCSV()">📥 导出CSV</button>
+      <div id="batch-result"></div>
+    </div>
+
+    <!-- 生成历史 -->
+    <div class="card" style="margin-top:16px">
+      <h2>📋 生成历史 <button class="secondary" style="width:auto;padding:4px 12px;font-size:12px" onclick="clearHistory()">清空</button></h2>
+      <div class="history" id="history"></div>
+    </div>
+  </div>
+
+  <script>
+    const SECRET_SEED = 'AHUT-CourseCram-2026-Engineering-Mechanics-Surveying';
+
+    function _encode(plain) {
+      let result = '';
+      const key = SECRET_SEED;
+      for (let i = 0; i < plain.length; i++) {
+        const cc = plain.charCodeAt(i) ^ key.charCodeAt(i % key.length);
+        result += String.fromCharCode(cc);
+      }
+      return btoa(result).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+    }
+
+    function _checksum(str) {
+      let sum = 0;
+      for (let i = 0; i < str.length; i++) {
+        sum = ((sum << 5) - sum) + str.charCodeAt(i);
+        sum |= 0;
+      }
+      return Math.abs(sum).toString(16).toUpperCase().padStart(4, '0');
+    }
+
+    function generateLicense(machineCode, expiryDays, type) {
+      let expiry = 0;
+      if (expiryDays > 0) {
+        expiry = Date.now() + expiryDays * 86400000;
+      }
+      const plain = machineCode.toUpperCase() + ':' + expiry + ':' + type;
+      const checksum = _checksum(machineCode.toUpperCase() + expiry + type);
+      return _encode(plain + ':' + checksum);
+    }
+
+    function addHistory(mc, days, type, key) {
+      const history = JSON.parse(localStorage.getItem('_keygen_history') || '[]');
+      history.unshift({
+        mc, days: days || '永久', type: type === 'U' ? '通用' : '绑定',
+        key, time: new Date().toLocaleString()
+      });
+      if (history.length > 100) history.length = 100;
+      localStorage.setItem('_keygen_history', JSON.stringify(history));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const history = JSON.parse(localStorage.getItem('_keygen_history') || '[]');
+      const el = document.getElementById('history');
+      if (history.length === 0) {
+        el.innerHTML = '<div style="color:#999;text-align:center;padding:20px">暂无生成记录</div>';
+        return;
+      }
+      el.innerHTML = history.map(h => `
+        <div class="history-item">
+          <div>机器码: ${h.mc} | 有效期: ${h.days} | 类型: ${h.type}</div>
+          <div style="color:#2e7d32;font-weight:600">${h.key}</div>
+          <span>${h.time}</span>
+        </div>
+      `).join('');
+    }
+
+    function generateSingle() {
+      const mc = document.getElementById('machineCode').value.trim();
+      if (!mc || mc.length < 8) {
+        document.getElementById('single-result').innerHTML = '<div class="danger">请输入有效的机器码（至少8位）</div>';
+        return;
+      }
+      const days = parseInt(document.getElementById('expiryType').value);
+      const type = document.getElementById('licenseType').value;
+      const key = generateLicense(mc, days, type);
+
+      const daysLabel = days === 0 ? '永久有效' : days + '天';
+      document.getElementById('single-result').innerHTML = `
+        <div class="result">
+          <div style="font-size:13px;color:#666;margin-bottom:4px">激活码（${daysLabel} · ${type === 'U' ? '通用' : '设备绑定'}）</div>
+          <div class="key">${key}</div>
+          <button class="secondary" style="margin-top:8px" onclick="navigator.clipboard.writeText('${key}');alert('已复制')">📋 复制激活码</button>
+        </div>
+      `;
+      addHistory(mc, days, type, key);
+    }
+
+    function generateBatch() {
+      const text = document.getElementById('batchCodes').value.trim();
+      if (!text) {
+        document.getElementById('batch-result').innerHTML = '<div class="danger">请输入至少一个机器码</div>';
+        return;
+      }
+      const codes = text.split(/[\n\r]+/).map(l => l.trim()).filter(l => l.length >= 8);
+      if (codes.length === 0) {
+        document.getElementById('batch-result').innerHTML = '<div class="danger">未找到有效的机器码</div>';
+        return;
+      }
+      const days = parseInt(document.getElementById('batchExpiry').value);
+      const type = 'D';
+      const daysLabel = days === 0 ? '永久有效' : days + '天';
+
+      let html = `<div class="result"><div style="font-weight:600;margin-bottom:8px">生成了 ${codes.length} 个激活码（${daysLabel} · 设备绑定）</div>`;
+      codes.forEach((mc, i) => {
+        const key = generateLicense(mc, days, type);
+        html += `<div style="font-size:12px;font-family:monospace;margin:4px 0;text-align:left">${i+1}. ${mc} → <b style="color:#2e7d32">${key}</b></div>`;
+        addHistory(mc, days, type, key);
+      });
+      html += `<button class="secondary" style="margin-top:8px" onclick="navigator.clipboard.writeText(this.parentElement.textContent.trim());alert('已复制全部')">📋 一键复制全部</button></div>`;
+      document.getElementById('batch-result').innerHTML = html;
+      window._lastBatch = codes.map(mc => ({ mc, key: generateLicense(mc, days, type), days: daysLabel }));
+    }
+
+    function exportCSV() {
+      if (!window._lastBatch || window._lastBatch.length === 0) {
+        alert('请先生成批量激活码');
+        return;
+      }
+      let csv = '机器码,激活码,有效期\n';
+      window._lastBatch.forEach(item => {
+        csv += `${item.mc},${item.key},${item.days}\n`;
+      });
+      const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = '激活码_' + new Date().toISOString().slice(0,10) + '.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function clearHistory() {
+      if (confirm('确认清空所有生成历史？')) {
+        localStorage.removeItem('_keygen_history');
+        renderHistory();
+      }
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tabs button').forEach((b, i) => {
+        b.classList.toggle('active', (tab === 'single' && i === 0) || (tab === 'batch' && i === 1));
+      });
+      document.getElementById('tab-single').style.display = tab === 'single' ? 'block' : 'none';
+      document.getElementById('tab-batch').style.display = tab === 'batch' ? 'block' : 'none';
+    }
+
+    renderHistory();
+  </script>
+</body>
+</html>

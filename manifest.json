@@ -1,0 +1,74 @@
+{
+  "@platforms": ["android"],
+  "id": "com.wangqiyuan.kaoyan",
+  "name": "专升本工程力学测量",
+  "version": {
+    "name": "1.0.0",
+    "code": "100"
+  },
+  "description": "安徽农业大学专升本-工程力学与工程测量备考系统",
+  "developer": {
+    "name": "CourseCram"
+  },
+  "permissions": {
+    "Audio": {},
+    "Vibrate": {}
+  },
+  "plus": {
+    "splashscreen": {
+      "autoclose": true,
+      "waiting": true,
+      "delay": 0
+    },
+    "statusbar": {
+      "immersed": "supportedDevice"
+    },
+    "popGesture": "none",
+    "runmode": "normal",
+    "distribute": {
+      "android": {
+        "packagename": "com.coursecram.examapp",
+        "keystore": "",
+        "alias": "",
+        "password": "",
+        "aliaspassword": "",
+        "minSdkVersion": "21",
+        "targetSdkVersion": "30",
+        "abiFilters": ["armeabi-v7a", "arm64-v8a"]
+      },
+      "icons": {
+        "android": {
+          "ldpi": "res/icon_48.png",
+          "mdpi": "res/icon_72.png",
+          "hdpi": "res/icon_96.png",
+          "xhdpi": "res/icon_144.png",
+          "xxhdpi": "res/icon_192.png"
+        }
+      },
+      "splashscreen": {
+        "android": {
+          "ldpi": "res/splash_200.png",
+          "mdpi": "res/splash_320.png",
+          "hdpi": "res/splash_480.png",
+          "xhdpi": "res/splash_720.png",
+          "xxhdpi": "res/splash_960.png"
+        }
+      }
+    },
+    "ssl": {
+      "error": "skip"
+    },
+    "webcache": {
+      "mode": "cacheElseNetwork"
+    }
+  },
+  "uni-app": {
+    "compilerVersion": "3"
+  },
+  "app": {
+    "usingComponents": true,
+    "nvue": {
+      "flex-direction": "column"
+    }
+  }
+}

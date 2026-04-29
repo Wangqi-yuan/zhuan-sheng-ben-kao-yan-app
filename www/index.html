@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover,shrink-to-fit=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="专升本备考">
+  <meta name="format-detection" content="telephone=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>专升本工程力学与工程测量</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <div class="header">
+      <span class="header-title" id="header-title">工程力学</span>
+      <div class="header-subject">
+        <button id="btn-mechanics" class="active">力学</button>
+        <button id="btn-surveying">测量</button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="main-content">
+      <div class="empty-state">
+        <div class="icon">📚</div>
+        <div>加载中...</div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+      <button class="nav-item active" data-stage="1">
+        <span class="nav-icon">📚</span>
+        <span>基础学习</span>
+      </button>
+      <button class="nav-item" data-stage="2">
+        <span class="nav-icon">🎯</span>
+        <span>专项攻坚</span>
+      </button>
+      <button class="nav-item" data-stage="3">
+        <span class="nav-icon">⚡</span>
+        <span>核心进阶</span>
+      </button>
+      <button class="nav-item" data-stage="4">
+        <span class="nav-icon">🏆</span>
+        <span>综合实战</span>
+      </button>
+      <button class="nav-item" data-stage="5">
+        <span class="nav-icon">🚀</span>
+        <span>冲刺模考</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Scripts - 离线可运行，无外部CDN依赖 -->
+  <script src="js/license.js"></script>
+  <script src="data/mechanics.js"></script>
+  <script src="data/surveying.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

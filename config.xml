@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.wangqiyuan.kaoyan" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>专升本工程力学测量</name>
+    <description>安徽农业大学专升本-工程力学与工程测量备考系统</description>
+    <author email="support@example.com" href="https://example.com">CourseCram</author>
+    <content src="index.html" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <preference name="Orientation" value="portrait" />
+    <preference name="Fullscreen" value="false" />
+    <preference name="StatusBarOverlaysWebView" value="false" />
+    <preference name="StatusBarBackgroundColor" value="#1a73e8" />
+    <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/splash_480.png" />
+    <preference name="loadUrlTimeoutValue" value="60000" />
+    <platform name="android">
+        <preference name="android-minSdkVersion" value="21" />
+        <preference name="android-targetSdkVersion" value="30" />
+        <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
+            <application android:usesCleartextTraffic="true" />
+        </edit-config>
+        <icon density="ldpi" src="res/icon_48.png" />
+        <icon density="mdpi" src="res/icon_72.png" />
+        <icon density="hdpi" src="res/icon_96.png" />
+        <icon density="xhdpi" src="res/icon_144.png" />
+        <icon density="xxhdpi" src="res/icon_192.png" />
+    </platform>
+</widget>

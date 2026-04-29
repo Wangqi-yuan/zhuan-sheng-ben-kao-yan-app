@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>APP图标生成器</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'PingFang SC','Microsoft YaHei',sans-serif; background:#f5f5f5; padding:20px; max-width:500px; margin:0 auto; }
+    .card { background:#fff; border-radius:12px; padding:20px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+    h1 { font-size:20px; margin-bottom:8px; color:#1a73e8; }
+    .subtitle { font-size:13px; color:#666; margin-bottom:16px; }
+    canvas { border:1px solid #e0e0e0; border-radius:8px; margin:8px; }
+    button { padding:10px 20px; background:#1a73e8; color:#fff; border:none; border-radius:8px; font-size:14px; cursor:pointer; margin:4px; }
+    button:active { opacity:0.8; }
+    button.green { background:#0d904f; }
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .icon-item { text-align:center; }
+    .icon-item canvas { width:80px; height:80px; }
+    .icon-item .label { font-size:11px; color:#666; margin-top:4px; }
+    .note { background:#fff3e0; padding:12px; border-radius:8px; font-size:13px; margin:12px 0; border-left:4px solid #ff9800; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🎨 APP图标生成器</h1>
+    <p class="subtitle">为HBuilderX打包生成所需尺寸的图标和启动图</p>
+    <div class="note">
+      <b>使用方法：</b><br>
+      1. 点击下方各尺寸按钮下载PNG图标<br>
+      2. 将下载的文件放入 app/res/ 目录<br>
+      3. 如需自定义图标，用PS/AI编辑后替换即可
+    </div>
+
+    <h2 style="margin-top:16px">📱 应用图标</h2>
+    <div class="grid" id="icon-grid"></div>
+
+    <h2 style="margin-top:16px">🚀 启动图（纯色）</h2>
+    <div class="grid" id="splash-grid"></div>
+
+    <button class="green" onclick="downloadAll()" style="width:100%;margin-top:16px;padding:14px">📥 一键下载全部图标</button>
+  </div>
+
+  <script>
+    const ICON_SIZES = [
+      { name:'icon_48.png', w:48, h:48, type:'icon' },
+      { name:'icon_72.png', w:72, h:72, type:'icon' },
+      { name:'icon_96.png', w:96, h:96, type:'icon' },
+      { name:'icon_144.png', w:144, h:144, type:'icon' },
+      { name:'icon_192.png', w:192, h:192, type:'icon' },
+    ];
+    const SPLASH_SIZES = [
+      { name:'splash_200.png', w:200, h:300, type:'splash' },
+      { name:'splash_320.png', w:320, h:480, type:'splash' },
+      { name:'splash_480.png', w:480, h:720, type:'splash' },
+      { name:'splash_720.png', w:720, h:1080, type:'splash' },
+      { name:'splash_960.png', w:960, h:1440, type:'splash' },
+    ];
+
+    function drawIcon(canvas, w, h, type) {
+      const ctx = canvas.getContext('2d');
+      canvas.width = w;
+      canvas.height = h;
+
+      if (type === 'icon') {
+        // 圆角矩形背景
+        const r = w * 0.2;
+        const bg = ctx.createLinearGradient(0, 0, w, h);
+        bg.addColorStop(0, '#1a73e8');
+        bg.addColorStop(1, '#1557b0');
+        ctx.fillStyle = bg;
+        ctx.beginPath();
+        ctx.moveTo(r, 0);
+        ctx.lineTo(w - r, 0);
+        ctx.quadraticCurveTo(w, 0, w, r);
+        ctx.lineTo(w, h - r);
+        ctx.quadraticCurveTo(w, h, w - r, h);
+        ctx.lineTo(r, h);
+        ctx.quadraticCurveTo(0, h, 0, h - r);
+        ctx.lineTo(0, r);
+        ctx.quadraticCurveTo(0, 0, r, 0);
+        ctx.fill();
+
+        // 文字
+        const fontSize = w * 0.35;
+        ctx.fillStyle = '#fff';
+        ctx.font = `bold ${fontSize}px "PingFang SC","Microsoft YaHei",sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('力学', w/2, h*0.4);
+
+        // 小字
+        const fs2 = w * 0.12;
+        ctx.font = `${fs2}px "PingFang SC","Microsoft YaHei",sans-serif`;
+        ctx.fillText('测量', w/2, h*0.7);
+      } else {
+        // 启动图：纯色背景 + 中心文字
+        ctx.fillStyle = '#1a73e8';
+        ctx.fillRect(0, 0, w, h);
+
+        const fontSize = Math.min(w, h) * 0.15;
+        ctx.fillStyle = '#fff';
+        ctx.font = `bold ${fontSize}px "PingFang SC","Microsoft YaHei",sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('专升本', w/2, h/2 - fontSize*0.8);
+        ctx.fillText('工程力学与工程测量', w/2, h/2 + fontSize*0.8);
+
+        // 底部小字
+        const fs3 = fontSize * 0.4;
+        ctx.font = `${fs3}px "PingFang SC","Microsoft YaHei",sans-serif`;
+        ctx.fillText('备考系统 v1.0', w/2, h - fs3*3);
+      }
+    }
+
+    function createDownloadLink(canvas, filename) {
+      canvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    function renderIcons() {
+      const iconGrid = document.getElementById('icon-grid');
+      const splashGrid = document.getElementById('splash-grid');
+
+      ICON_SIZES.forEach(s => {
+        const div = document.createElement('div');
+        div.className = 'icon-item';
+        const canvas = document.createElement('canvas');
+        drawIcon(canvas, s.w, s.h, s.type);
+        const label = document.createElement('div');
+        label.className = 'label';
+        label.textContent = `${s.name} (${s.w}×${s.h})`;
+        const btn = document.createElement('button');
+        btn.textContent = '下载';
+        btn.style.cssText = 'font-size:11px;padding:4px 12px;';
+        btn.addEventListener('click', () => createDownloadLink(canvas, s.name));
+        div.appendChild(canvas);
+        div.appendChild(label);
+        div.appendChild(btn);
+        iconGrid.appendChild(div);
+      });
+
+      SPLASH_SIZES.forEach(s => {
+        const div = document.createElement('div');
+        div.className = 'icon-item';
+        const canvas = document.createElement('canvas');
+        drawIcon(canvas, s.w, s.h, s.type);
+        const label = document.createElement('div');
+        label.className = 'label';
+        label.textContent = `${s.name} (${s.w}×${s.h})`;
+        const btn = document.createElement('button');
+        btn.textContent = '下载';
+        btn.style.cssText = 'font-size:11px;padding:4px 12px;';
+        btn.addEventListener('click', () => createDownloadLink(canvas, s.name));
+        div.appendChild(canvas);
+        div.appendChild(label);
+        div.appendChild(btn);
+        splashGrid.appendChild(div);
+      });
+    }
+
+    function downloadAll() {
+      const allSizes = [...ICON_SIZES, ...SPLASH_SIZES];
+      allSizes.forEach((s, i) => {
+        setTimeout(() => {
+          const canvas = document.createElement('canvas');
+          drawIcon(canvas, s.w, s.h, s.type);
+          createDownloadLink(canvas, s.name);
+        }, i * 200);
+      });
+      alert('开始下载全部 ' + allSizes.length + ' 个图标文件（请允许浏览器多次下载）');
+    }
+
+    renderIcons();
+  </script>
+</body>
+</html>
