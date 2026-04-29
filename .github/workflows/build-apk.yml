@@ -36,34 +36,56 @@ jobs:
             -keypass android \
             -dname "CN=CourseCram, OU=Dev, O=CourseCram, L=Hefei, ST=Anhui, C=CN"
 
-      - name: 添加 Android 平台 (兼容版本)
+      - name: 添加 Android 平台
         run: cordova platform add android@13
 
-      - name: 构建 APK
+      - name: 构建发布包
         run: cordova build android --release
 
-      - name: 查找 APK
+      - name: 处理输出文件
         run: |
-          echo "=== 所有APK文件 ==="
-          find . -name "*.apk" 2>/dev/null
-          echo ""
-          echo "=== 所有AAB文件 ==="
-          find . -name "*.aab" 2>/dev/null
+          echo "=== 查找构建产物 ==="
+          find platforms/android -name "*.apk" 2>/dev/null
+          find platforms/android -name "*.aab" 2>/dev/null
 
-      - name: 签名 APK
-        run: |
           APK=$(find platforms/android -name "*.apk" | grep -i release | head -1)
-          if [ -z "$APK" ]; then
-            echo "No APK found, checking all build outputs..."
-            find platforms/android -type f \( -name "*.apk" -o -name "*.aab" \) 2>/dev/null
-            exit 1
+          AAB=$(find platforms/android -name "*.aab" | grep -i release | head -1)
+
+          if [ -n "$APK" ]; then
+            echo "Found APK: $APK"
+            cp "$APK" app-release.apk
+          elif [ -n "$AAB" ]; then
+            echo "Found AAB: $AAB (converting to universal APK...)"
+            # Download bundletool if not available
+            BUNDLETOOL=""
+            for p in "$ANDROID_SDK_ROOT/cmdline-tools/latest/lib/bundletool.jar" \
+                     "$ANDROID_HOME/cmdline-tools/latest/lib/bundletool.jar" \
+                     "bundletool.jar"; do
+              if [ -f "$p" ]; then BUNDLETOOL="$p"; break; fi
+            done
+            if [ -z "$BUNDLETOOL" ]; then
+              echo "Downloading bundletool..."
+              curl -sL -o bundletool.jar \
+                "https://github.com/google/bundletool/releases/download/1.17.2/bundletool-all-1.17.2.jar"
+              BUNDLETOOL="bundletool.jar"
+            fi
+            java -jar "$BUNDLETOOL" build-apks \
+              --bundle="$AAB" \
+              --output=app.apks \
+              --mode=universal \
+              --ks=release.keystore \
+              --ks-pass=pass:android \
+              --ks-key-alias=myapp \
+              --key-pass=pass:android
+            unzip -o app.apks universal.apk -d ./apkout/ && cp ./apkout/universal.apk app-release.apk
           fi
-          echo "Found: $APK ($(du -h "$APK" | cut -f1))"
-          # Try to sign (may already be signed)
-          cp "$APK" app-release.apk 2>/dev/null || true
-          # Verify it's valid
+
           if [ -f app-release.apk ]; then
             echo "✓ APK ready: $(du -h app-release.apk | cut -f1)"
+          else
+            echo "ERROR: No APK/AAB found!"
+            find platforms/android -type f \( -name "*.apk" -o -name "*.aab" \)
+            exit 1
           fi
 
       - name: 上传 APK
