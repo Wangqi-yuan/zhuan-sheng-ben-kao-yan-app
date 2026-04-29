@@ -21,7 +21,7 @@ jobs:
       - name: 设置 Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: 'platforms;android-30 build-tools;30.0.3 platform-tools'
+          packages: 'platforms;android-36 build-tools;36.0.0 platform-tools'
 
       - name: 安装 Cordova
         run: npm install -g cordova
