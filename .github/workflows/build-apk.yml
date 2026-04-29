@@ -39,29 +39,39 @@ jobs:
       - name: 添加 Android 平台
         run: cordova platform add android@latest
 
-      - name: 构建未签名 APK
+      - name: 构建 APK
         run: |
+          # Use gradle directly (cordova installs it)
           cd platforms/android
-          ./gradlew assembleRelease
+          chmod +x gradlew 2>/dev/null || true
+          ./gradlew assembleRelease || gradle assembleRelease
           cd ../..
 
-      - name: 查找并对齐 APK
+      - name: 查找并签名 APK
         run: |
-          UNSIGNED_APK=$(find platforms/android -name "*.apk" | grep -i release | head -1)
-          echo "Found unsigned APK: $UNSIGNED_APK"
-          # zipalign
-          $ANDROID_HOME/build-tools/36.0.0/zipalign -v -p 4 "$UNSIGNED_APK" app-release-aligned.apk
-          # sign
+          echo "=== 查找APK文件 ==="
+          find platforms/android -name "*.apk" 2>/dev/null
+          echo ""
+          echo "=== 查找AAB文件 ==="
+          find platforms/android -name "*.aab" 2>/dev/null
+          echo ""
+          UNSIGNED=$(find platforms/android -name "*.apk" | grep -i release | head -1)
+          if [ -z "$UNSIGNED" ]; then
+            echo "ERROR: No APK found!"
+            find platforms/android -type f -name "*release*" 2>/dev/null
+            exit 1
+          fi
+          echo "Signing: $UNSIGNED"
+          $ANDROID_HOME/build-tools/36.0.0/zipalign -v -p 4 "$UNSIGNED" app-aligned.apk
           $ANDROID_HOME/build-tools/36.0.0/apksigner sign \
             --ks release.keystore \
             --ks-pass pass:android \
             --ks-key-alias myapp \
             --key-pass pass:android \
             --out app-release.apk \
-            app-release-aligned.apk
-          # verify
+            app-aligned.apk
           $ANDROID_HOME/build-tools/36.0.0/apksigner verify app-release.apk
-          echo "APK size: $(du -h app-release.apk | cut -f1)"
+          echo "✓ APK ready: $(du -h app-release.apk | cut -f1)"
 
       - name: 上传 APK
         uses: actions/upload-artifact@v4
