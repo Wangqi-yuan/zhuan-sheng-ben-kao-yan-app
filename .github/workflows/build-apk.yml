@@ -35,26 +35,39 @@ jobs:
             -storepass android \
             -keypass android \
             -dname "CN=CourseCram, OU=Dev, O=CourseCram, L=Hefei, ST=Anhui, C=CN"
-          echo "KEYSTORE_PASS=android" >> $GITHUB_ENV
-          echo "KEY_ALIAS=myapp" >> $GITHUB_ENV
-          echo "KEY_PASS=android" >> $GITHUB_ENV
 
       - name: 添加 Android 平台
         run: cordova platform add android@latest
 
-      - name: 构建发布 APK
+      - name: 构建未签名 APK
         run: |
-          cordova build android --release -- \
-            --keystore=release.keystore \
-            --storePassword=android \
-            --alias=myapp \
-            --password=android
+          cd platforms/android
+          ./gradlew assembleRelease
+          cd ../..
+
+      - name: 查找并对齐 APK
+        run: |
+          UNSIGNED_APK=$(find platforms/android -name "*.apk" | grep -i release | head -1)
+          echo "Found unsigned APK: $UNSIGNED_APK"
+          # zipalign
+          $ANDROID_HOME/build-tools/36.0.0/zipalign -v -p 4 "$UNSIGNED_APK" app-release-aligned.apk
+          # sign
+          $ANDROID_HOME/build-tools/36.0.0/apksigner sign \
+            --ks release.keystore \
+            --ks-pass pass:android \
+            --ks-key-alias myapp \
+            --key-pass pass:android \
+            --out app-release.apk \
+            app-release-aligned.apk
+          # verify
+          $ANDROID_HOME/build-tools/36.0.0/apksigner verify app-release.apk
+          echo "APK size: $(du -h app-release.apk | cut -f1)"
 
       - name: 上传 APK
         uses: actions/upload-artifact@v4
         with:
           name: 专升本备考-工程力学测量
-          path: platforms/android/app/build/outputs/apk/release/app-release.apk
+          path: app-release.apk
 
       - name: 备份签名文件
         uses: actions/upload-artifact@v4
