@@ -14,9 +14,6 @@
     <platform name="android">
         <preference name="android-minSdkVersion" value="21" />
         <preference name="android-targetSdkVersion" value="36" />
-        <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
-            <application android:usesCleartextTraffic="true" />
-        </edit-config>
         <icon density="ldpi" src="res/icon_48.png" />
         <icon density="mdpi" src="res/icon_72.png" />
         <icon density="hdpi" src="res/icon_96.png" />
