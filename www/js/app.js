@@ -520,7 +520,7 @@
         `}
         <div class="text-xs color-secondary mt-8">您的机器码（点击复制发送给卖家）</div>
         <div class="machine-code" onclick="navigator.clipboard?.writeText(this.textContent);App._toast('机器码已复制')">${mc}</div>
-        <input type="text" id="license-input" placeholder="请输入16位激活码" maxlength="32" autocomplete="off">
+        <input type="text" id="license-input" placeholder="请输入激活码" maxlength="80" autocomplete="off">
         <div id="license-msg"></div>
         <button class="quiz-btn mt-12" id="btn-activate">🔓 激活</button>
         ${trialInfo.inTrial ? `<button class="quiz-btn secondary mt-8" id="btn-trial">⏰ 试用 ${trialInfo.daysLeft} 天（免费）</button>` : ''}
