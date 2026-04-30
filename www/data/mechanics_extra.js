@@ -95,7 +95,7 @@ const MechanicsExtraData = {
       // 第1章 静力学基础 - 从章节试卷提取（附答案）
       { id:'SX01', type:'choice', chapter:'第1章', difficulty:1,
         q:'光滑面约束的约束反力总是沿接触面的（ ）方向，并指向被约束的物体。',
-        opts:['任意','铅垂','公切线','公法线'], ans:3,
+        opts:['任意','铅垂','公切线','公法线'], ans:3, svg:'constraintSmoothSurface',
         explain:'光滑面约束反力沿接触面公法线指向被约束物体。' },
       { id:'SX02', type:'choice', chapter:'第1章', difficulty:1,
         q:'约束反力的方向必与（ ）的方向相反。',
@@ -203,7 +203,7 @@ const MechanicsExtraData = {
     advanced_extra: [
       { id:'AX01', type:'calc', chapter:'第1章', difficulty:2,
         q:'图示简支梁AB，跨度l=4m，距A端1.5m处受集中力F=20kN。求支座A、B的反力。',
-        ans:'R_A=12.5kN(↑), R_B=7.5kN(↑)',
+        ans:'R_A=12.5kN(↑), R_B=7.5kN(↑)', svg:'beamSimplePoint',
         explain:'∑M_A=0: R_B×4-20×1.5=0→R_B=7.5kN。∑F_y=0: R_A+R_B-20=0→R_A=12.5kN。' },
       { id:'AX02', type:'calc', chapter:'第3章', difficulty:3,
         q:'发动机凸轮机构，α=30°，β=20°。压下阀门需400N力。求凸轮对滚子A的压力F及支座O的约束反力。（杠杆AOB，OA=500mm，OB=300mm）',
@@ -219,7 +219,7 @@ const MechanicsExtraData = {
         explain:'由强度：A≥24000/140=171.4mm²。由刚度：A≥24000×3000/(200×10³×2)=180mm²。取大者A=180mm²。' },
       { id:'AX05', type:'calc', chapter:'第12章', difficulty:4,
         q:'图示拐轴受铅垂载荷F=20kN，[σ]=160MPa。按第三强度理论确定AB轴直径d。（等效弯矩M_e=√(M²+T²)）',
-        ans:'d≥∛(32M_e/(π[σ]))',
+        ans:'d≥∛(32M_e/(π[σ]))', svg:'torsionPureShear',
         explain:'弯扭组合变形用第三强度理论：σ_r3=√(σ²+4τ²)=M_e/W_z≤[σ]。W_z=πd³/32，反求d。' },
     ],
 
@@ -395,6 +395,244 @@ const MechanicsExtraData = {
   }
 };
 
+  // ==================== 整套模拟卷（完整保留，不拆分为单题） ====================
+  fullMockSets: [
+    {
+      id: 'full-mock-1',
+      title: '《工程力学》试卷1',
+      source: '百度网盘/专升本《工程力学》试卷（含解析）.pdf',
+      totalScore: 100,
+      timeLimit: 120,
+      sections: [
+        {
+          type: 'choice',
+          title: '一、单项选择题（本大题共10小题，每小题2分，共20分）',
+          questions: [
+            { id:'FM1-C01', type:'choice', chapter:'第1章', difficulty:2,
+              q:'光滑面对物体的约束力，作用在接触点处，方向沿接触面的公法线，且（ ）',
+              opts:['指向受力物体，恒为拉力','指向受力物体，恒为压力','背离受力物体，恒为拉力','背离受力物体，恒为压力'], ans:1,
+              explain:'光滑面约束反力方向沿接触面公法线，指向被约束物体（恒为压力）。' },
+            { id:'FM1-C02', type:'choice', chapter:'第1章', difficulty:2,
+              q:'力的可传性原理是指作用于刚体上的力可在不改变其对刚体的作用效果下（ ）',
+              opts:['平行其作用线移到刚体上任一点','沿其作用线移到刚体上任一点','垂直其作用线移到刚体上任一点','任意移动到刚体上任一点'], ans:1,
+              explain:'力沿作用线在刚体上移动不改变作用效果，力的可传性只适用于同一刚体。' },
+            { id:'FM1-C03', type:'choice', chapter:'第3章', difficulty:1,
+              q:'平面任意力系独立的平衡方程式有（ ）',
+              opts:['1个','2个','3个','4个'], ans:2,
+              explain:'平面任意力系有3个独立平衡方程：∑F_x=0, ∑F_y=0, ∑M=0。' },
+            { id:'FM1-C04', type:'choice', chapter:'第5章', difficulty:2,
+              q:'使材料丧失正常工作能力的应力称为极限应力，低碳钢的极限应力是（ ）',
+              opts:['比例极限σ_P','弹性极限σ_e','屈服极限σ_s','强度极限σ_b'], ans:2,
+              explain:'塑性材料（低碳钢）以屈服极限σ_s为极限应力。' },
+            { id:'FM1-C05', type:'choice', chapter:'第9章', difficulty:2,
+              q:'当水平梁上某横截面的弯矩为负值时，则该横截面上正应力的分布是（ ）',
+              opts:['上边缘受拉、下边缘受压','上边缘受压、下边缘受拉','全截面受拉','全截面受压'], ans:1,
+              explain:'弯矩为负（下凸）→上压下拉。正应力大小与到中性轴距离成正比。' },
+            { id:'FM1-C06', type:'choice', chapter:'第5章', difficulty:1,
+              q:'各向同性假设认为，材料沿各个方向具有相同的（ ）',
+              opts:['应力','变形','位移','力学性质'], ans:3,
+              explain:'各向同性假设：材料各方向具有相同的力学性质（E、μ等相同）。' },
+            { id:'FM1-C07', type:'choice', chapter:'第5章', difficulty:2,
+              q:'关于截面法下列叙述中正确的是（ ）',
+              opts:['截面法是分析杆件变形的基本方法','截面法是分析杆件应力的基本方法','截面法是分析杆件内力的基本方法','截面法是分析杆件内力与应力关系的基本方法'], ans:2,
+              explain:'截面法是求内力的基本方法（假想截开→替代→建立平衡方程）。' },
+            { id:'FM1-C08', type:'choice', chapter:'第10章', difficulty:3,
+              q:'在下列关于梁转角的说法中，错误的是（ ）',
+              opts:['转角是横截面绕中性轴转过的角度','转角是横截面绕梁轴线转过的角度','转角是变形前后同一横截面间的夹角','转角是挠曲线之切线与轴向坐标轴间的夹角'], ans:1,
+              explain:'转角是横截面绕中性轴转过的角度，不是绕梁轴线。' },
+            { id:'FM1-C09', type:'choice', chapter:'第3章', difficulty:3,
+              q:'图示平面结构，由两根自重不计的直角弯杆组成，C为铰链。不计各接触处摩擦，若在D处作用有水平向左的主动力F，则支座A对系统的约束反力为（ ）',
+              opts:['F，方向水平向右','F，方向铅垂向上','√2F/2，方向由A指向C','√2F/2，方向由A背离C'], ans:2, svg:'threeHingedArch',
+              explain:'三铰拱结构，A为固定铰支座。∑M_B=0可求得R_A=√2F/2，方向由A指向C。' },
+            { id:'FM1-C10', type:'choice', chapter:'第3章', difficulty:3,
+              q:'图示平面直角弯杆ABC，AB=3m，BC=4m，受两个力偶作用，M₁=300N·m、M₂=600N·m。不计杆重及各接触处摩擦，则A、C支座的约束反力的大小为（ ）',
+              opts:['F_A=300N，F_C=100N','F_A=300N，F_C=300N','F_A=100N，F_C=300N','F_A=100N，F_C=100N'], ans:2,
+              explain:'力偶只能由力偶平衡。∑M=0: F_A×3-300-600=0→F_A=100N。同理F_C=300N。' }
+          ]
+        },
+        {
+          type: 'fill',
+          title: '二、填空题（本大题共10小题，每小题2分，共20分）',
+          questions: [
+            { id:'FM1-F01', type:'fill', chapter:'第1章', difficulty:1,
+              q:'理论力学研究的物体是______与质点。',
+              ans:'刚体', explain:'理论力学研究刚体和质点的运动与平衡。' },
+            { id:'FM1-F02', type:'fill', chapter:'第3章', difficulty:2,
+              q:'平面任意力系平衡方程有二矩式：∑M_A=0, ∑M_B=0, ∑F_x=0，附加条件是______。',
+              ans:'A、B连线不与x轴垂直', explain:'二矩式的附加条件：两矩心的连线不能与投影轴垂直，否则方程不独立。' },
+            { id:'FM1-F03', type:'fill', chapter:'第3章', difficulty:2,
+              q:'作用于物体上的主动力，如果其合力的作用线在摩擦角以内，则不论这个力多大，物体总能保持静止，这种现象称为______。',
+              ans:'自锁', explain:'自锁条件：驱动力合力作用线与法线夹角≤摩擦角φ_m。' },
+            { id:'FM1-F04', type:'fill', chapter:'第5章', difficulty:1,
+              q:'构件上随外力解除而消失的变形，称为______。',
+              ans:'弹性变形', explain:'弹性变形可恢复；塑性变形（残余变形）不可恢复。' },
+            { id:'FM1-F05', type:'fill', chapter:'第6章', difficulty:2,
+              q:'轴向承受拉伸或压缩的杆件，其轴向变形公式中的分母EA越大，轴向变形越小，因而EA称为______。',
+              ans:'拉压刚度', explain:'EA为拉压刚度，表征杆件抵抗轴向拉压变形的能力。' },
+            { id:'FM1-F06', type:'fill', chapter:'第8章', difficulty:1,
+              q:'一般情况下，梁受弯曲后横截面上的内力是剪力和______。',
+              ans:'弯矩', explain:'梁弯曲时横截面上一般同时存在剪力F_S和弯矩M。' },
+            { id:'FM1-F07', type:'fill', chapter:'第9章', difficulty:2,
+              q:'梁发生平面弯曲时，其纵向纤维既不伸长也不缩短的一层称为______。',
+              ans:'中性层', explain:'中性层上纤维长度不变，中性层与横截面的交线为中性轴。' },
+            { id:'FM1-F08', type:'fill', chapter:'第10章', difficulty:2,
+              q:'从弯曲变形的计算公式中可以看出，梁的变形大小与抗弯刚度成______比。',
+              ans:'反', explain:'挠度v∝1/EI，EI为抗弯刚度，EI越大变形越小。' },
+            { id:'FM1-F09', type:'fill', chapter:'第7章', difficulty:3,
+              q:'空心圆截面外径、内径分别为D和d，则其抗扭截面系数W_n=______。',
+              ans:'(πD³/16)(1-α⁴), α=d/D', explain:'空心圆轴W_n=πD³(1-α⁴)/16。' },
+            { id:'FM1-F10', type:'fill', chapter:'第7章', difficulty:2,
+              q:'轴传递的功率一定时，转速越______，外力偶矩越小。',
+              ans:'高', explain:'T=9549×P/n，n越大T越小，反比关系。' }
+          ]
+        },
+        {
+          type: 'calc',
+          title: '三、计算题（共60分）',
+          questions: [
+            { id:'FM1-A01', type:'calc', chapter:'第3章', difficulty:3,
+              q:'【12分】已知G=20kN，图示支架中A为固定铰支座，C为活动铰支座，B处受集中力G。求A、C处的约束力。',
+              ans:'R_A=28.28kN, R_C=20kN(→)',
+              explain:'∑M_A=0: R_C·h-G·d=0→R_C=20kN。∑F_x=0: R_Ax=20kN。∑F_y=0: R_Ay=20kN。R_A=√(20²+20²)=28.28kN。' },
+            { id:'FM1-A02', type:'calc', chapter:'第3章', difficulty:4,
+              q:'【12分】重物的重力为G，杆AB、CB与滑轮相连。不计滑轮的自重力，求支座A处的约束力以及BC杆所受的力。',
+              ans:'F_BC=G/sinθ(拉), R_Ax=G·cotθ, R_Ay=0',
+              explain:'取滑轮为研究对象。BC杆为二力杆，受力沿BC方向。∑F_x=0, ∑F_y=0求解。' },
+            { id:'FM1-A03', type:'calc', chapter:'第15章', difficulty:3,
+              q:'【12分】试求所示图形的形心位置，单位为cm。设O点为坐标原点。（组合截面由矩形和半圆组成）',
+              ans:'x_c=0, y_c=由静矩法求出',
+              explain:'组合截面形心：y_c=∑(A_i·y_ci)/∑A_i，将截面分解为简单图形分别计算静矩。' },
+            { id:'FM1-A04', type:'calc', chapter:'第6章', difficulty:3,
+              q:'【12分】一根钢质圆杆长3m，直径为25mm，E=200GPa，两端受到100kN的轴向拉力作用。试计算钢杆的应力、应变及绝对变形量。',
+              ans:'σ=203.7MPa, ε=1.019×10⁻³, Δl=3.06mm',
+              explain:'A=π×25²/4=490.9mm²。σ=F/A=100000/490.9=203.7MPa。ε=σ/E=1.019×10⁻³。Δl=ε·l=3.06mm。' },
+            { id:'FM1-A05', type:'calc', chapter:'第8章', difficulty:4,
+              q:'【12分】试作图示AB梁的剪力图和弯矩图，并求出|F_S|_max和|M|_max。',
+              ans:'|F_S|_max=按荷载计算, |M|_max=按弯矩图得出',
+              explain:'用截面法分段列剪力方程和弯矩方程，或利用q、F_S、M三者间的微分关系快速作图。' }
+          ]
+        }
+      ]
+    },
+    {
+      id: 'full-mock-2',
+      title: '《工程力学》试卷2',
+      source: '百度网盘/工程力学(专升本)模拟试卷一及答案.pdf',
+      totalScore: 100,
+      timeLimit: 120,
+      sections: [
+        {
+          type: 'choice',
+          title: '一、单项选择题（本大题共10小题，每小题2分，共20分）',
+          questions: [
+            { id:'FM2-C01', type:'choice', chapter:'第1章', difficulty:2,
+              q:'力的可传性原理适用于（ ）',
+              opts:['一个刚体','多个刚体','变形体','由刚体和变形体组成的系统'], ans:0,
+              explain:'力的可传性只适用于同一刚体，不适用于变形体和多个刚体组成的系统。' },
+            { id:'FM2-C02', type:'choice', chapter:'第3章', difficulty:3,
+              q:'图示结构中属于超静定结构的是（ ）',
+              opts:['简支梁','三铰拱','一端固定一端铰支的梁','悬臂梁'], ans:2,
+              explain:'一端固定（3个约束）+一端铰支（2个约束）=5个未知力，而平面力系只有3个独立方程，为二次超静定。' },
+            { id:'FM2-C03', type:'choice', chapter:'第1章', difficulty:2,
+              q:'三直角折杆AB、BC、BD连接如图示，不计自重。其中属二力杆的杆件是（ ）',
+              opts:['AB杆','BC杆','AB杆和BC杆','BD杆'], ans:2,
+              explain:'二力杆条件：两端铰接、中间不受力（自重不计）、受力沿两端连线。' },
+            { id:'FM2-C04', type:'choice', chapter:'第7章', difficulty:2,
+              q:'当轴传递的功率不变时，该轴所承受的外力偶矩M与其转速成（ ）',
+              opts:['正比','反比','二次函数关系','三次函数关系'], ans:1,
+              explain:'M=9549×P/n，功率P不变时，转速n越高，外力偶矩M越小——反比关系。' },
+            { id:'FM2-C05', type:'choice', chapter:'第6章', difficulty:2,
+              q:'脆性材料的许用应力[σ]小于（ ）',
+              opts:['σ_e','σ_p','σ_s','σ_b'], ans:3,
+              explain:'脆性材料以强度极限σ_b为极限应力，[σ]=σ_b/n，故[σ]<σ_b。' },
+            { id:'FM2-C06', type:'choice', chapter:'第7章', difficulty:3,
+              q:'直径和长度相同而材料不同的圆轴，在相同扭矩作用下，它们的（ ）',
+              opts:['最大切应力相同，扭转角不同','最大切应力相同，扭转角也相同','最大切应力不同，扭转角相同','最大切应力不同，扭转角也不同'], ans:0,
+              explain:'τ_max=T/W_t，与材料无关故相同。φ=Tl/(GI_p)，G（剪切模量）与材料有关，故φ不同。' },
+            { id:'FM2-C07', type:'choice', chapter:'第7章', difficulty:3,
+              q:'空心圆轴扭转时受扭矩T作用，横截面切应力分布的正确表达应为（ ）',
+              opts:['切应力沿半径线性分布，外壁最大','切应力沿半径均匀分布','切应力在空心处最大','切应力在圆心处最大'], ans:0,
+              explain:'圆轴扭转切应力τρ=T·ρ/I_p，沿半径线性分布，圆心处为零，外壁处最大。' },
+            { id:'FM2-C08', type:'choice', chapter:'第10章', difficulty:3,
+              q:'两外伸梁的尺寸和支座均相同，受力的方向有所不同，根据叠加法，挠度最大处可能是（ ）',
+              opts:['(a)图的D截面或C截面','(a)图的C截面或(b)图的C截面','(b)图的D截面','(b)图的C截面'], ans:0,
+              explain:'外伸梁挠度最大处可能在跨中（C截面）或外伸端（D截面），需计算比较。' },
+            { id:'FM2-C09', type:'choice', chapter:'第2章', difficulty:1,
+              q:'平面汇交力系独立的平衡方程式有（ ）',
+              opts:['1个','2个','3个','4个'], ans:1,
+              explain:'平面汇交力系只有2个独立方程：∑F_x=0, ∑F_y=0。' },
+            { id:'FM2-C10', type:'choice', chapter:'第6章', difficulty:1,
+              q:'挤压强度条件是，挤压应力不得超过材料的（ ）',
+              opts:['许用挤压应力','极限挤压应力','最大挤压应力','破坏挤压应力'], ans:0,
+              explain:'挤压强度条件：σ_bs ≤ [σ_bs]（许用挤压应力）。' }
+          ]
+        },
+        {
+          type: 'fill',
+          title: '二、填空题（本大题共10小题，每小题2分，共20分）',
+          questions: [
+            { id:'FM2-F01', type:'fill', chapter:'第5章', difficulty:1,
+              q:'杆件基本的变形有拉伸与压缩、______、扭转、弯曲。',
+              ans:'剪切', explain:'杆件四种基本变形：拉压、剪切、扭转、弯曲。' },
+            { id:'FM2-F02', type:'fill', chapter:'第2章', difficulty:2,
+              q:'平面汇交力系平衡的必要和充分条件是______。',
+              ans:'合力为零（或力多边形自行闭合）', explain:'汇交力系平衡⇔合力为零⇔力多边形闭合。' },
+            { id:'FM2-F03', type:'fill', chapter:'第2章', difficulty:2,
+              q:'平面力偶系可以合成为一个合力偶，合力偶矩等于各分力偶矩的______。',
+              ans:'代数和', explain:'力偶系合成：M=M₁+M₂+...+Mₙ（代数和）。' },
+            { id:'FM2-F04', type:'fill', chapter:'第5章', difficulty:1,
+              q:'求杆件受力后的内力所用的方法是______。',
+              ans:'截面法', explain:'截面法是求内力的基本方法（截开→替代→平衡）。' },
+            { id:'FM2-F05', type:'fill', chapter:'第8章', difficulty:2,
+              q:'在梁的集中力偶作用处，梁的弯矩图发生______。',
+              ans:'突变', explain:'集中力偶处弯矩图突变（突变值=力偶矩大小），剪力图不变。' },
+            { id:'FM2-F06', type:'fill', chapter:'第6章', difficulty:1,
+              q:'轴向拉伸或压缩时直杆横截面上的内力称为______。',
+              ans:'轴力', explain:'拉压杆横截面内力为轴力F_N，拉力为正(+)，压力为负(-)。' },
+            { id:'FM2-F07', type:'fill', chapter:'第5章', difficulty:2,
+              q:'材料中应力变化不大，而应变显著增加的现象称为______。',
+              ans:'屈服', explain:'屈服阶段：应力波动不大（屈服极限附近），应变急剧增大。' },
+            { id:'FM2-F08', type:'fill', chapter:'第7章', difficulty:3,
+              q:'空心圆截面外径、内径分别为D和d，则其抗扭截面系数W_n=______。',
+              ans:'(πD³/16)(1-α⁴), α=d/D', explain:'空心圆轴W_n=πD³(1-α⁴)/16。' },
+            { id:'FM2-F09', type:'fill', chapter:'第15章', difficulty:2,
+              q:'矩形截面（宽b、高h）对中性轴的惯性矩I_z=______。',
+              ans:'bh³/12', explain:'矩形截面惯性矩I_z=bh³/12，抗弯截面系数W_z=bh²/6。' },
+            { id:'FM2-F10', type:'fill', chapter:'第10章', difficulty:2,
+              q:'度量梁弯曲变形的两个基本量是挠度和______。',
+              ans:'转角', explain:'挠度v（线位移）和转角θ（角位移）是度量弯曲变形的两个基本量。' }
+          ]
+        },
+        {
+          type: 'calc',
+          title: '三、计算题（共60分）',
+          questions: [
+            { id:'FM2-A01', type:'calc', chapter:'第3章', difficulty:3,
+              q:'【12分】已知G=20kN，图示支架中A为固定铰支座，C为活动铰支座。求A、C处的约束力。',
+              ans:'R_C=G·tanθ, R_A=G/cosθ',
+              explain:'∑M_A=0求R_C；∑F_x=0、∑F_y=0求R_A的两个分量，再合成。' },
+            { id:'FM2-A02', type:'calc', chapter:'第3章', difficulty:4,
+              q:'【12分】图示构架中，DH杆的中点有一销钉E套在AC杆的导槽内。求B、C两支座的约束力。',
+              ans:'按力系平衡方程联立求解',
+              explain:'取整体为研究对象→列∑M_A=0→求R_B；再取DH杆或AC杆为对象求R_C。' },
+            { id:'FM2-A03', type:'calc', chapter:'第15章', difficulty:3,
+              q:'【12分】试求所示图形的形心位置，单位为cm。设O点为坐标原点。',
+              ans:'用静矩法：y_c=∑(A_i·y_ci)/∑A_i',
+              explain:'将组合截面分解为矩形、三角形等简单图形，分别计算面积和形心坐标，再用组合公式求整体形心。' },
+            { id:'FM2-A04', type:'calc', chapter:'第6章', difficulty:3,
+              q:'【12分】一根钢质圆杆长3m，直径为25mm，E=200GPa，两端受到100kN的轴向拉力作用。试计算钢杆的应力和应变。',
+              ans:'σ=203.7MPa, ε=1.019×10⁻³',
+              explain:'A=π×25²/4=490.9mm²。σ=F/A=100000/490.9=203.7MPa。ε=σ/E=1.019×10⁻³。' },
+            { id:'FM2-A05', type:'calc', chapter:'第8章', difficulty:4,
+              q:'【12分】试作图示AB梁的剪力图和弯矩图，并求出|F_S|_max和|M|_max。',
+              ans:'按荷载用截面法或微分关系作图',
+              explain:'利用dF_S/dx=-q, dM/dx=F_S的微分关系快速作图：q=0段F_S为常数M为直线，q=常数段F_S为直线M为抛物线。' }
+          ]
+        }
+      ]
+    }
+  ],
+
   // ==================== 自动合并到主数据 ====================
   (function mergeIntoMainData() {
     if (typeof MechanicsData === 'undefined') return;
@@ -420,6 +658,12 @@ const MechanicsExtraData = {
         mainQuizzes[mainKey] = mainQuizzes[mainKey].concat(extraQuizzes[extraKey]);
       }
     });
+
+    // 合并整套模拟卷
+    if (MechanicsExtraData.fullMockSets && MechanicsExtraData.fullMockSets.length > 0) {
+      if (!MechanicsData.fullMockSets) MechanicsData.fullMockSets = [];
+      MechanicsData.fullMockSets = MechanicsData.fullMockSets.concat(MechanicsExtraData.fullMockSets);
+    }
   })();
 
   window.MechanicsExtraData = MechanicsExtraData;
