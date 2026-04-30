@@ -4,3 +4,4 @@ platforms/
 plugins/
 *.log
 .unpackage/
+apk-output/

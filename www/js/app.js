@@ -51,62 +51,56 @@
     });
 
     // Content
-    const main = $('#main-content');
+    var main = $('#main-content');
     main.innerHTML = '';
     main.appendChild(buildStagePage(stage));
+    finalizeStagePage(stage);
     main.scrollTop = 0;
   }
 
   function buildStagePage(stage) {
-    const frag = document.createDocumentFragment();
+    var frag = document.createDocumentFragment();
 
     // 阶段标题卡
-    const headerCard = document.createElement('div');
-    headerCard.className = `card ${stage.color}`;
-    headerCard.innerHTML = `
-      <div class="flex-row">
-        <span class="stage-dot stage-dot-${STATE.stage}"></span>
-        <span style="font-size:40px">${stage.icon}</span>
-        <div style="flex:1">
-          <div class="fw-600" style="font-size:18px">${stage.name}</div>
-          <div class="text-sm color-secondary mt-8">${stage.desc}</div>
-        </div>
-      </div>
-    `;
+    var headerCard = document.createElement('div');
+    headerCard.className = 'card ' + stage.color;
+    headerCard.innerHTML = '<div class="flex-row"><span class="stage-dot stage-dot-' + STATE.stage + '"></span><span style="font-size:40px">' + stage.icon + '</span><div style="flex:1"><div class="fw-600" style="font-size:18px">' + stage.name + '</div><div class="text-sm color-secondary mt-8">' + stage.desc + '</div></div></div>';
     frag.appendChild(headerCard);
 
-    // 搜索栏（仅知识学习阶段）
-    if (STATE.stage <= 3) {
-      const searchDiv = document.createElement('div');
-      searchDiv.className = 'search-bar';
-      searchDiv.innerHTML = `
-        <input type="text" placeholder="🔍 搜索知识点..." id="search-input" value="${STATE.searchQuery}">
-      `;
-      frag.appendChild(searchDiv);
-      setTimeout(() => {
-        $('#search-input')?.addEventListener('input', (e) => {
-          STATE.searchQuery = e.target.value;
-          renderStageContent(frag);
-        });
-      }, 0);
-    }
-
-    // 阶段内容容器
-    const contentDiv = document.createElement('div');
+    // 阶段内容容器（提前创建，搜索栏之后用）
+    var contentDiv = document.createElement('div');
     contentDiv.id = 'stage-content';
     frag.appendChild(contentDiv);
-    setTimeout(() => renderStageContent(frag), 0);
 
     return frag;
   }
 
-  function renderStageContent(parentEl) {
-    const container = $('#stage-content', parentEl) || parentEl;
-    // 清除旧内容（保留搜索栏之前的内容）
-    while (container.lastChild) {
-      if (container.lastChild.id === 'stage-content') break;
-      // 找到stage-content就停止
+  function finalizeStagePage(stage) {
+    var main = $('#main-content');
+    // 搜索栏（仅知识学习阶段）
+    if (STATE.stage <= 3) {
+      var searchDiv = document.createElement('div');
+      searchDiv.className = 'search-bar';
+      searchDiv.innerHTML = '<input type="text" placeholder="🔍 搜索知识点..." id="search-input" value="' + STATE.searchQuery + '">';
+      // Insert after header card, before stage-content
+      var stageContent = $('#stage-content', main);
+      if (stageContent && stageContent.parentNode === main) {
+        main.insertBefore(searchDiv, stageContent);
+      }
+      setTimeout(function() {
+        var si = $('#search-input');
+        if (si) si.addEventListener('input', function(e) {
+          STATE.searchQuery = e.target.value;
+          renderStageContent(main);
+        });
+      }, 0);
     }
+    // 渲染内容
+    setTimeout(function() { renderStageContent(main); }, 0);
+  }
+
+  function renderStageContent(parentEl) {
+    var container = $('#stage-content', parentEl) || parentEl;
     container.innerHTML = '';
 
     if (STATE.stage <= 3) {
@@ -160,7 +154,7 @@
         const weightStars = '🔥'.repeat(kp.examWeight || 1);
 
         card.innerHTML = `
-          <div class="flex-between" onclick="this.closest('.kp-card').querySelector('.kp-detail').classList.toggle('show')">
+          <div class="flex-between" data-action="toggle-kp" style="cursor:pointer">
             <div style="flex:1;min-width:0">
               <div class="kp-title">${kp.title}</div>
               <div class="text-xs color-secondary">${weightStars} 考频权重</div>
@@ -169,11 +163,11 @@
           </div>
           <div class="kp-detail">
             <div style="margin-bottom:8px">${kp.content}</div>
-            ${kp.formula ? `<div class="kp-formula">📝 $${kp.formula}$</div>` : ''}
+            ${kp.formula ? '<div class="kp-formula">📝 $' + kp.formula + '$</div>' : ''}
             <div class="mt-8">
-              ${kp.keywords.map(k => `<span class="chapter-tag">${k}</span>`).join('')}
+              ${kp.keywords.map(function(k) { return '<span class="chapter-tag">' + k + '</span>'; }).join('')}
             </div>
-            <button class="quiz-btn secondary mt-12" onclick="App.startChapterQuiz('${kp.chapter}')">
+            <button class="quiz-btn secondary mt-12" data-action="chapter-quiz" data-chapter="${kp.chapter.replace(/"/g, '&quot;')}">
               📝 练习本章题目
             </button>
           </div>
@@ -241,9 +235,11 @@
     container.appendChild(info);
 
     // 绑定按钮
-    setTimeout(() => {
-      $('#btn-start-mock')?.addEventListener('click', () => startMockExam(questions, true));
-      $('#btn-review-mock')?.addEventListener('click', () => startMockExam(questions, false));
+    setTimeout(function() {
+      var bsm = $('#btn-start-mock');
+      var brm = $('#btn-review-mock');
+      if (bsm) bsm.addEventListener('click', function() { startMockExam(questions, true); });
+      if (brm) brm.addEventListener('click', function() { startMockExam(questions, false); });
     }, 0);
   }
 
@@ -305,27 +301,23 @@
 
     if (q.type === 'choice') {
       html += '<div class="quiz-options">';
-      q.opts.forEach((opt, i) => {
-        const stateClass = getOptionClass(quiz, q, i);
-        html += `<div class="quiz-option ${stateClass}" onclick="App.selectAnswer(${i})">${String.fromCharCode(65+i)}. ${opt}</div>`;
+      q.opts.forEach(function(opt, i) {
+        var stateClass = getOptionClass(quiz, q, i);
+        html += '<div class="quiz-option ' + stateClass + '" data-action="select-answer" data-index="' + i + '">' + String.fromCharCode(65+i) + '. ' + opt + '</div>';
       });
       html += '</div>';
     } else {
-      const userAns = quiz.answers[quiz.currentIndex] || '';
-      const showResult = quiz.answers[quiz.currentIndex] !== null;
-      html += `
-        <input type="text" class="quiz-option" style="width:100%;text-align:left;font-family:monospace"
-               placeholder="输入答案..." value="${escapeHtml(userAns)}"
-               onchange="App.submitFillAnswer(this.value)" ${showResult ? 'disabled' : ''}>
-        ${showResult ? `<div class="quiz-result ${isAnswerCorrect(quiz, q) ? 'correct' : 'wrong'} show">
-          ${isAnswerCorrect(quiz, q) ? '✅ 正确' : '❌ 错误'} — 答案: ${q.ans}
-        </div>` : ''}
-      `;
+      var userAns = quiz.answers[quiz.currentIndex] || '';
+      var showResult = quiz.answers[quiz.currentIndex] !== null;
+      html += '<input type="text" class="quiz-option" style="width:100%;text-align:left;font-family:monospace" id="fill-answer-input" placeholder="输入答案..." value="' + escapeHtml(userAns) + '" data-action="fill-input" ' + (showResult ? 'disabled' : '') + '>';
+      if (showResult) {
+        html += '<div class="quiz-result ' + (isAnswerCorrect(quiz, q) ? 'correct' : 'wrong') + ' show">' + (isAnswerCorrect(quiz, q) ? '✅ 正确' : '❌ 错误') + ' — 答案: ' + q.ans + '</div>';
+      }
     }
 
     html += '<div class="flex-between mt-12">';
-    html += `<button class="quiz-btn secondary" style="width:auto;padding:8px 20px" onclick="App.prevQuestion()" ${quiz.currentIndex === 0 ? 'disabled' : ''}>← 上一题</button>`;
-    html += `<button class="quiz-btn" style="width:auto;padding:8px 20px" onclick="App.nextQuestion()">${quiz.currentIndex === quiz.totalQuestions - 1 ? '完成交卷' : '下一题 →'}</button>`;
+    html += '<button class="quiz-btn secondary" style="width:auto;padding:8px 20px" data-action="prev-question"' + (quiz.currentIndex === 0 ? ' disabled' : '') + '>← 上一题</button>';
+    html += '<button class="quiz-btn" style="width:auto;padding:8px 20px" data-action="next-question">' + (quiz.currentIndex === quiz.totalQuestions - 1 ? '完成交卷' : '下一题 →') + '</button>';
     html += '</div>';
     html += '</div>';
 
@@ -427,9 +419,9 @@
           </div>
         </div>
         ${score < 60 ? '<div class="text-sm color-secondary mt-8">💡 建议：回顾对应知识点后再练习</div>' : ''}
-        <button class="quiz-btn mt-12" onclick="App.retryQuiz()">🔄 重新作答</button>
-        <button class="quiz-btn secondary mt-8" onclick="App.reviewAnswers()">📖 查看解析</button>
-        <button class="quiz-btn secondary mt-8" onclick="App.goToStage()">↩ 返回</button>
+        <button class="quiz-btn mt-12" data-action="retry-quiz">🔄 重新作答</button>
+        <button class="quiz-btn secondary mt-8" data-action="review-answers">📖 查看解析</button>
+        <button class="quiz-btn secondary mt-8" data-action="go-to-stage">↩ 返回</button>
       </div>
     `;
     main.scrollTop = 0;
@@ -519,7 +511,7 @@
           </div>
         `}
         <div class="text-xs color-secondary mt-8">您的机器码（点击复制发送给卖家）</div>
-        <div class="machine-code" onclick="navigator.clipboard?.writeText(this.textContent);App._toast('机器码已复制')">${mc}</div>
+        <div class="machine-code" onclick="if(navigator.clipboard){navigator.clipboard.writeText(this.textContent).then(function(){App._toast('机器码已复制')}).catch(function(){})}">${mc}</div>
         <input type="text" id="license-input" placeholder="请输入激活码" maxlength="80" autocomplete="off">
         <div id="license-msg"></div>
         <button class="quiz-btn mt-12" id="btn-activate">🔓 激活</button>
@@ -552,30 +544,97 @@
     }
   }
 
-  // ==================== 初始化 ====================
-  function init() {
-    // 检查激活状态
-    const licensed = checkLicense();
-    if (!licensed) {
-      const trialInfo = LicenseSystem.getTrialInfo();
-      if (!trialInfo.inTrial) {
-        showLicenseDialog();
-        return;
+  // ==================== 事件委托 ====================
+  function setupEventDelegation() {
+    var main = $('#main-content');
+    main.addEventListener('click', function(e) {
+      var el = e.target;
+      // Walk up to find a data-action element
+      while (el && el !== main) {
+        var action = el.getAttribute('data-action');
+        if (action) break;
+        el = el.parentElement;
       }
-      // 有试用期，先展示激活弹窗（可跳过）
-      setTimeout(() => showLicenseDialog(), 500);
-    }
-    STATE.licenseChecked = true;
+      if (!el || el === main) return;
+      var action = el.getAttribute('data-action');
 
-    // 绑定事件
-    $('#btn-mechanics').addEventListener('click', () => switchSubject('mechanics'));
-    $('#btn-surveying').addEventListener('click', () => switchSubject('surveying'));
-    $$('.nav-item').forEach(el => {
-      el.addEventListener('click', () => switchStage(el.dataset.stage));
+      switch (action) {
+        case 'toggle-kp':
+          var card = el.closest('.kp-card');
+          if (card) { var detail = card.querySelector('.kp-detail'); if (detail) detail.classList.toggle('show'); }
+          break;
+        case 'chapter-quiz':
+          App.startChapterQuiz(el.getAttribute('data-chapter'));
+          break;
+        case 'select-answer':
+          App.selectAnswer(parseInt(el.getAttribute('data-index')));
+          break;
+        case 'submit-fill':
+          App.submitFillAnswer($('#fill-answer-input', main).value);
+          break;
+        case 'prev-question':
+          App.prevQuestion();
+          break;
+        case 'next-question':
+          App.nextQuestion();
+          break;
+        case 'retry-quiz':
+          App.retryQuiz();
+          break;
+        case 'review-answers':
+          App.reviewAnswers();
+          break;
+        case 'go-to-stage':
+          App.goToStage();
+          break;
+      }
     });
 
-    // 初始渲染
-    render();
+    // Input change handler for fill answer (delegated)
+    main.addEventListener('change', function(e) {
+      if (e.target.getAttribute('data-action') === 'fill-input') {
+        App.submitFillAnswer(e.target.value);
+      }
+    });
+  }
+
+  // ==================== 初始化 ====================
+  function init() {
+    try {
+      // 检查激活状态
+      var licensed = checkLicense();
+      if (!licensed) {
+        var trialInfo = LicenseSystem.getTrialInfo();
+        if (!trialInfo.inTrial) {
+          showLicenseDialog();
+          return;
+        }
+        // 有试用期，先展示激活弹窗（可跳过）
+        setTimeout(function() { showLicenseDialog(); }, 500);
+      }
+      STATE.licenseChecked = true;
+
+      // 绑定事件
+      var btnM = $('#btn-mechanics');
+      var btnS = $('#btn-surveying');
+      if (btnM) btnM.addEventListener('click', function() { switchSubject('mechanics'); });
+      if (btnS) btnS.addEventListener('click', function() { switchSubject('surveying'); });
+      $$('.nav-item').forEach(function(el) {
+        el.addEventListener('click', function() { switchStage(el.dataset.stage); });
+      });
+
+      // 设置事件委托
+      setupEventDelegation();
+
+      // 初始渲染
+      render();
+    } catch (e) {
+      // 致命错误时至少显示错误信息
+      var main = $('#main-content');
+      if (main) {
+        main.innerHTML = '<div class="empty-state"><div class="icon" style="font-size:48px">⚠️</div><div style="color:#d50000;font-weight:600">应用初始化失败</div><div class="text-sm color-secondary mt-8">错误: ' + e.message + '</div><div class="text-xs color-secondary mt-8">请尝试重新安装或联系技术支持</div></div>';
+      }
+    }
   }
 
   // ==================== 对外暴露API ====================

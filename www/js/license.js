@@ -4,7 +4,16 @@
  * 算法：HMAC-like XOR + Base64 编码
  */
 
-const LicenseSystem = {
+// Math.imul polyfill for older Android WebViews (pre-Chrome 28)
+if (!Math.imul) {
+  Math.imul = function(a, b) {
+    var ah = (a >>> 16) & 0xffff, al = a & 0xffff;
+    var bh = (b >>> 16) & 0xffff, bl = b & 0xffff;
+    return ((al * bl) + (((ah * bl + al * bh) << 16) >>> 0)) | 0;
+  };
+}
+
+var LicenseSystem = {
   // 内置密钥种子（打包时固定）
   SECRET_SEED: 'AHUT-CourseCram-2026-Engineering-Mechanics-Surveying',
 

@@ -233,6 +233,11 @@ html, body {
   font-size: 14px;
 }
 .quiz-option:active { transform: scale(0.98); }
+input.quiz-option {
+  cursor: text;
+  -webkit-user-select: text;
+  user-select: text;
+}
 .quiz-option.selected { border-color: var(--primary); background: #e3f2fd; }
 .quiz-option.correct { border-color: var(--success); background: #e8f5e9; }
 .quiz-option.wrong { border-color: var(--danger); background: #fce4ec; }
